@@ -1,4 +1,4 @@
-# ETAT — Glace Mauve (app stats hockey)
+# ETAT — Hockey Stats (app stats hockey ; dépôt/URL « glace-mauve »)
 
 ## Objectif
 App web FR de stats hockey (buts, passes, +/−, points auto) pour Nicolas + un ami, extensible à d'autres amis.
