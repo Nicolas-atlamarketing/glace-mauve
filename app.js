@@ -94,13 +94,13 @@
     msg("aMsg", "");
   }));
   const validEmail = (v) => /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(v);
-  const strongEnough = (p) => p.length >= 10 && p.length <= 72 && new Set(p).size >= 5;
+  const strongEnough = (p) => p.length >= 10 && p.length <= 72 && /[a-z]/i.test(p) && /[0-9]/.test(p) && new Set(p).size >= 5;
 
   $("authForm").addEventListener("submit", (e) => {
     e.preventDefault();
     const email = $("aEmail").value.trim().toLowerCase(), password = $("aPass").value;
     if (!validEmail(email)) return msg("aMsg", "Courriel invalide.", "err");
-    if (authMode === "signup" && !strongEnough(password)) return msg("aMsg", "Mot de passe trop faible : 10 caractères minimum et variés.", "err");
+    if (authMode === "signup" && !strongEnough(password)) return msg("aMsg", "Mot de passe trop faible : 10 caractères minimum, avec lettres et chiffres.", "err");
     busy($("aSubmit"), async () => {
       msg("aMsg", "…");
       if (authMode === "login") {
@@ -127,7 +127,7 @@
   $("resetForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const password = $("rPass").value;
-    if (!strongEnough(password)) return msg("rMsg", "10 caractères minimum et variés.", "err");
+    if (!strongEnough(password)) return msg("rMsg", "10 caractères minimum, avec lettres et chiffres.", "err");
     const { error } = await sb.auth.updateUser({ password });
     if (error) return msg("rMsg", errText(error), "err");
     $("rPass").value = ""; S.recovering = false; toast("Mot de passe mis à jour.", "good"); route();
