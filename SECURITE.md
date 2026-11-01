@@ -39,3 +39,11 @@ Revue défensive de notre propre application (2026-11-01). Aucune garantie de s�
 - Le propriétaire du projet Supabase (Nicolas) garde un accès total via le tableau de bord : c'est aussi la voie de récupération ultime si tous les codes de secours sont perdus (Authentication → Users → supprimer le facteur MFA).
 - Projet gratuit : mis en pause après ~7 jours sans activité (réactivation gratuite dans le tableau de bord). Envoi de courriels Supabase limité (quelques/heure).
 - Dépôt public : le code est lisible (aucun secret dedans) ; la sécurité ne repose pas sur son secret.
+- Historique Git réécrit (courriels retirés des fichiers et des auteurs), mais GitHub garde les anciens commits accessibles par leur identifiant tant que le dépôt n'est pas supprimé et recréé.
+
+## Passe de durcissement (2026-11-01, après mise en service)
+- Security Advisor Supabase : 0 erreur. Les fonctions d'aide RLS (`is_member`, `is_admin`, `member_row`, `can_play`, `is_aal2`) sont passées dans le schéma `private` → plus appelables par l'API (vérifié : 404). Restent publiques, par conception, 4 RPC qui n'agissent que sur le compte appelant (`whoami`, `generate_recovery_codes`, `recovery_codes_left`, `redeem_recovery_code`).
+- Test multi-identités relancé après durcissement : **32/32 OK**.
+- Réglages Auth : mot de passe 10 caractères min. + lettres et chiffres (serveur et client), changement de mot de passe sécurisé activé, changement de courriel sécurisé actif, confirmation du courriel obligatoire.
+- État réel vérifié : 1 compte (admin), courriel confirmé, 2FA vérifiée ; 2 membres invités ; aucun compte non invité.
+- Non activable gratuitement : protection contre les mots de passe divulgués (forfait Pro).

@@ -47,7 +47,7 @@
       <input id="aEmail" type="email" autocomplete="username" required maxlength="254" inputmode="email">
       <label for="aPass">Mot de passe</label>
       <input id="aPass" type="password" autocomplete="current-password" required minlength="10" maxlength="72">
-      <p id="aHint" class="hint" hidden>10 caractères minimum. Utilise une phrase de passe unique.</p>
+      <p id="aHint" class="hint" hidden>10 caractères minimum, avec lettres et chiffres. Utilise une phrase de passe unique.</p>
       <button id="aSubmit" class="btn primary" type="submit">Se connecter</button>
       <button id="aForgot" class="link" type="button">Mot de passe oublié ?</button>
     </form>
@@ -58,7 +58,7 @@
   <section id="s-reset" class="gate panel" hidden>
     <h2>Nouveau mot de passe</h2>
     <form id="resetForm" class="stack" novalidate>
-      <label for="rPass">Nouveau mot de passe (10 caractères min.)</label>
+      <label for="rPass">Nouveau mot de passe (10 caractères min., lettres et chiffres)</label>
       <input id="rPass" type="password" autocomplete="new-password" required minlength="10" maxlength="72">
       <button class="btn primary" type="submit">Enregistrer</button>
     </form>
