@@ -29,7 +29,7 @@ Comptes perso, 2FA obligatoire, données partagées synchronisées. Design mauve
 - Fait (2026-11-01) : Nicolas inscrit, 2FA active, app confirmée fonctionnelle par lui. Historique Git réécrit (courriels retirés).
 - Cette semaine : Nicolas saisit ses matchs manuellement dans l'app.
 - Fait : durcissement sécurité (fonctions RLS dans private, mdp 10+ lettres/chiffres, test 32/32 après). Voir SECURITE.md.
-- À décider : supprimer/recréer le dépôt GitHub pour effacer les anciens commits (courriels encore lisibles par SHA).
+- Fait : dépôt GitHub supprimé puis recréé (même nom/URL) avec historique propre ; anciens commits introuvables (404) ; copie locale purgée.
 - Fait : ami invité (2e membre, non admin ; courriel dans la table league_members, jamais dans ce dépôt public) ; lien envoyé par iMessage.
 - Règle : aucun courriel/téléphone d'ami dans le dépôt (public).
 - À faire : Michael s'inscrit avec ce courriel exact, active sa 2FA ; tester à deux (sync + isolation).
