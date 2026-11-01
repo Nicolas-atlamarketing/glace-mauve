@@ -51,3 +51,4 @@ Comptes perso, 2FA obligatoire, données partagées synchronisées. Design mauve
 ## Pièges
 - CSP stricte : pas de script/style inline, pas d'attribut style= dans les gabarits (utiliser style.setProperty).
 - Confirmation courriel : Site URL Supabase par défaut = localhost → à régler dans le tableau de bord.
+- Courriels Supabase gratuits : 2/heure max (inscriptions + réinitialisations). Lien de réinitialisation déclenché hors appareil (tableau de bord / API) : géré par app.js (jetons du fragment → setSession).
