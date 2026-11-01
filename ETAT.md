@@ -44,7 +44,7 @@ Comptes perso, 2FA obligatoire, données partagées synchronisées. Design mauve
 ## Commandes
 - Aperçu local : `python3 -m http.server 5178 --directory web` (ou preview « glace-mauve »).
 - Vérif syntaxe : `node --check web/app.js web/scene.js`.
-- Déployer : `git subtree push --prefix web origin gh-pages`.
+- Déployer : `C=$(git commit-tree $(git rev-parse HEAD:web) -p origin/gh-pages -m deploy) && git push origin $C:refs/heads/gh-pages` (après `git fetch origin gh-pages`)
 
 ## Pièges
 - CSP stricte : pas de script/style inline, pas d'attribut style= dans les gabarits (utiliser style.setProperty).
