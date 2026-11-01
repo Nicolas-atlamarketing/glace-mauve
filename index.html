@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://*.supabase.co wss://*.supabase.co; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0d0718">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Glace Mauve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Outfit:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="rink3d" aria-hidden="true"></canvas>
+<div class="aurora" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="brand">
+    <div class="puck3d" aria-hidden="true"><i></i></div>
+    <div>
+      <h1>Glace Mauve</h1>
+      <p class="sub">Ligue privée · saison 2026-2027</p>
+    </div>
+  </div>
+  <div class="top-right">
+    <span id="sync" class="sync" data-state="idle"><i></i><b>Hors ligne</b></span>
+    <button id="btnLogout" class="btn ghost small" type="button" hidden>Déconnexion</button>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+
+  <!-- ========== Accès : connexion / inscription ========== -->
+  <section id="s-auth" class="gate panel" hidden>
+    <h2>Entrer sur la glace</h2>
+    <p class="muted">Accès réservé aux membres invités. Double authentification obligatoire.</p>
+    <div class="seg" role="tablist">
+      <button type="button" class="seg-btn active" data-auth="login">Connexion</button>
+      <button type="button" class="seg-btn" data-auth="signup">Créer mon compte</button>
+    </div>
+    <form id="authForm" class="stack" novalidate>
+      <label for="aEmail">Courriel</label>
+      <input id="aEmail" type="email" autocomplete="username" required maxlength="254" inputmode="email">
+      <label for="aPass">Mot de passe</label>
+      <input id="aPass" type="password" autocomplete="current-password" required minlength="10" maxlength="72">
+      <p id="aHint" class="hint" hidden>10 caractères minimum. Utilise une phrase de passe unique.</p>
+      <button id="aSubmit" class="btn primary" type="submit">Se connecter</button>
+      <button id="aForgot" class="link" type="button">Mot de passe oublié ?</button>
+    </form>
+    <p id="aMsg" class="msg" role="status"></p>
+  </section>
+
+  <!-- ========== Nouveau mot de passe (lien reçu par courriel) ========== -->
+  <section id="s-reset" class="gate panel" hidden>
+    <h2>Nouveau mot de passe</h2>
+    <form id="resetForm" class="stack" novalidate>
+      <label for="rPass">Nouveau mot de passe (10 caractères min.)</label>
+      <input id="rPass" type="password" autocomplete="new-password" required minlength="10" maxlength="72">
+      <button class="btn primary" type="submit">Enregistrer</button>
+    </form>
+    <p id="rMsg" class="msg" role="status"></p>
+  </section>
+
+  <!-- ========== 2FA : enrôlement ========== -->
+  <section id="s-enroll" class="gate panel" hidden>
+    <h2>Active la double authentification</h2>
+    <ol class="steps">
+      <li>Ouvre une appli d'authentification (Google Authenticator, Authy, 1Password, Apple Mots de passe…).</li>
+      <li>Scanne ce code QR, ou saisis la clé manuellement.</li>
+      <li>Entre le code à 6 chiffres affiché.</li>
+    </ol>
+    <div class="qr-wrap"><img id="eQr" alt="Code QR pour l'appli d'authentification" width="200" height="200"></div>
+    <p class="mono-line"><span class="muted">Clé :</span> <code id="eSecret"></code></p>
+    <form id="enrollForm" class="stack" novalidate>
+      <label for="eCode">Code à 6 chiffres</label>
+      <input id="eCode" class="otp" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required>
+      <button class="btn primary" type="submit">Vérifier et activer</button>
+    </form>
+    <p id="eMsg" class="msg" role="status"></p>
+  </section>
+
+  <!-- ========== 2FA : défi ========== -->
+  <section id="s-challenge" class="gate panel" hidden>
+    <h2>Code de vérification</h2>
+    <p class="muted">Entre le code à 6 chiffres de ton appli d'authentification.</p>
+    <form id="challengeForm" class="stack" novalidate>
+      <label for="cCode">Code à 6 chiffres</label>
+      <input id="cCode" class="otp" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required>
+      <button class="btn primary" type="submit">Valider</button>
+    </form>
+    <details class="recover">
+      <summary>J'ai perdu l'accès à mon appli d'authentification</summary>
+      <p class="muted">Utilise un de tes codes de secours (format XXXXX-XXXXX). Ta 2FA sera réinitialisée et tu en configureras une nouvelle immédiatement.</p>
+      <form id="recoverForm" class="stack" novalidate>
+        <label for="rcCode">Code de secours</label>
+        <input id="rcCode" autocomplete="off" maxlength="16" required>
+        <button class="btn" type="submit">Utiliser ce code</button>
+      </form>
+      <p class="muted small">Plus de codes ? L'administrateur de la ligue ne peut pas désactiver ta 2FA depuis l'appli : il doit supprimer ton facteur dans le tableau de bord Supabase (Authentication → Users). Voir le guide de récupération.</p>
+    </details>
+    <p id="cMsg" class="msg" role="status"></p>
+  </section>
+
+  <!-- ========== Codes de secours (affichés une seule fois) ========== -->
+  <section id="s-codes" class="gate panel" hidden>
+    <h2>Tes codes de secours</h2>
+    <p class="muted">Chaque code ne sert qu'une fois et permet de retrouver l'accès si tu perds ton téléphone. Note-les hors de ton téléphone (papier, gestionnaire de mots de passe). Ils ne seront plus jamais affichés.</p>
+    <ol id="codesList" class="codes"></ol>
+    <div class="row">
+      <button id="btnCopyCodes" class="btn" type="button">Copier les codes</button>
+    </div>
+    <label class="check"><input id="codesSaved" type="checkbox"> J'ai noté mes codes en lieu sûr</label>
+    <button id="btnCodesDone" class="btn primary" type="button" disabled>Continuer</button>
+  </section>
+
+  <!-- ========== En attente d'invitation ========== -->
+  <section id="s-pending" class="gate panel" hidden>
+    <h2>Accès en attente</h2>
+    <p>Ton compte <b id="pEmail"></b> n'est pas encore membre de la ligue.</p>
+    <p class="muted">Demande à l'administrateur d'ajouter ce courriel dans <em>Ligue → Inviter un ami</em>, puis recharge la page. Si tu viens de créer ton compte, confirme d'abord ton courriel avec le lien reçu.</p>
+    <button id="btnRecheck" class="btn" type="button">Vérifier à nouveau</button>
+  </section>
+
+  <!-- ========== Création du profil joueur ========== -->
+  <section id="s-profile" class="gate panel" hidden>
+    <h2 id="pfTitle">Crée ton profil de joueur</h2>
+    <form id="profileForm" class="stack" novalidate>
+      <label for="pfName">Nom affiché</label>
+      <input id="pfName" required maxlength="24" autocomplete="nickname">
+      <div class="grid2">
+        <div class="stack"><label for="pfJersey">Numéro</label><input id="pfJersey" type="number" inputmode="numeric" min="0" max="99"></div>
+        <div class="stack"><label for="pfPos">Position</label>
+          <select id="pfPos"><option>Attaquant</option><option>Défenseur</option><option>Polyvalent</option><option>Gardien</option></select>
+        </div>
+      </div>
+      <button class="btn primary" type="submit">Enregistrer mon profil</button>
+      <button id="pfCancel" class="btn ghost" type="button" hidden>Annuler</button>
+    </form>
+    <p id="pfMsg" class="msg" role="status"></p>
+  </section>
+
+  <!-- ========== Application ========== -->
+  <div id="app" hidden>
+    <nav class="tabs" aria-label="Sections">
+      <button type="button" class="tab active" data-view="classement"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7"/></svg><span>Classement</span></button>
+      <button type="button" class="tab" data-view="saisir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Saisir</span></button>
+      <button type="button" class="tab" data-view="historique"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v5l3 2M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9z"/></svg><span>Matchs</span></button>
+      <button type="button" class="tab" data-view="ligue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11a4 4 0 1 0-8 0M4 21a8 8 0 0 1 16 0"/></svg><span>Ligue</span></button>
+    </nav>
+
+    <section id="v-classement" class="view">
+      <div class="stage">
+        <div id="leader" class="leader panel tilt"></div>
+      </div>
+      <div class="cols">
+        <div class="panel tilt">
+          <h2 class="h-sec">Classement</h2>
+          <ol id="rankList" class="ranks"></ol>
+        </div>
+        <div class="panel tilt">
+          <h2 class="h-sec">Duel</h2>
+          <div class="duel-pick">
+            <select id="dA" aria-label="Premier joueur"></select>
+            <span class="vs">VS</span>
+            <select id="dB" aria-label="Deuxième joueur"></select>
+          </div>
+          <div id="duel" class="duel"></div>
+        </div>
+      </div>
+      <div class="fx-row">
+        <label for="fxMode">Effets 3D</label>
+        <select id="fxMode"><option value="auto">Automatique</option><option value="low">Allégés</option><option value="off">Désactivés</option></select>
+      </div>
+    </section>
+
+    <section id="v-saisir" class="view" hidden>
+      <form id="gameForm" class="panel entry" novalidate>
+        <h2 class="h-sec" id="gfTitle">Nouveau match</h2>
+        <div class="grid2">
+          <div class="stack"><label for="gDate">Date du match</label><input id="gDate" type="date" required></div>
+          <div class="stack"><label for="gOpp">Adversaire (facultatif)</label><input id="gOpp" maxlength="40" autocomplete="off"></div>
+        </div>
+        <div class="steppers">
+          <div class="stepper" data-field="goals" data-min="0" data-max="20">
+            <span class="st-label">Buts</span>
+            <div class="st-row"><button type="button" class="st-btn" data-d="-1" aria-label="Retirer un but">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="Ajouter un but">+</button></div>
+          </div>
+          <div class="stepper" data-field="assists" data-min="0" data-max="20">
+            <span class="st-label">Passes</span>
+            <div class="st-row"><button type="button" class="st-btn" data-d="-1" aria-label="Retirer une passe">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="Ajouter une passe">+</button></div>
+          </div>
+          <div class="stepper" data-field="plus_minus" data-min="-15" data-max="15">
+            <span class="st-label">Différentiel +/−</span>
+            <div class="st-row"><button type="button" class="st-btn" data-d="-1" aria-label="Diminuer le différentiel">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="Augmenter le différentiel">+</button></div>
+          </div>
+        </div>
+        <div class="total"><span class="muted">Points du match</span><b id="gPts" class="xnum">0</b><span class="muted small">buts + passes, recalculés par le serveur</span></div>
+        <div class="row">
+          <button id="gSubmit" class="btn primary" type="submit">Enregistrer le match</button>
+          <button id="gCancel" class="btn ghost" type="button" hidden>Annuler la modification</button>
+        </div>
+        <p id="gMsg" class="msg" role="status"></p>
+      </form>
+    </section>
+
+    <section id="v-historique" class="view" hidden>
+      <div class="panel">
+        <div class="row between">
+          <h2 class="h-sec">Matchs</h2>
+          <select id="hPlayer" aria-label="Filtrer par joueur"></select>
+        </div>
+        <ul id="hList" class="games"></ul>
+      </div>
+    </section>
+
+    <section id="v-ligue" class="view" hidden>
+      <div class="cols">
+        <div class="panel">
+          <h2 class="h-sec">Joueurs</h2>
+          <div id="pGrid" class="players"></div>
+          <button id="btnEditProfile" class="btn" type="button">Modifier mon profil</button>
+        </div>
+        <div class="stack-lg">
+          <div id="adminBox" class="panel" hidden>
+            <h2 class="h-sec">Inviter un ami</h2>
+            <p class="muted small">Ajoute son courriel : il pourra créer son compte avec cette adresse, puis activer sa 2FA.</p>
+            <form id="inviteForm" class="row" novalidate>
+              <label for="iEmail" class="sr">Courriel de l'ami</label>
+              <input id="iEmail" type="email" inputmode="email" maxlength="254" placeholder="ami@exemple.com" required>
+              <button class="btn primary" type="submit">Inviter</button>
+            </form>
+            <ul id="memberList" class="members"></ul>
+            <p id="iMsg" class="msg" role="status"></p>
+          </div>
+          <div class="panel">
+            <h2 class="h-sec">Sécurité de mon compte</h2>
+            <p>2FA : <b class="ok">active</b> · Codes de secours restants : <b id="codesLeft">…</b></p>
+            <button id="btnRegen" class="btn" type="button">Générer de nouveaux codes de secours</button>
+            <p class="muted small">Les nouveaux codes remplacent les anciens.</p>
+            <button id="btnExport" class="btn ghost" type="button">Exporter les matchs (CSV)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="config.js"></script>
+<script src="scene.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
