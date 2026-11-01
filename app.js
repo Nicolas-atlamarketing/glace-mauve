@@ -1,4 +1,4 @@
-// Glace Mauve — logique de l'application.
+// Hockey Stats — logique de l'application.
 // Toute autorisation réelle est appliquée par la base (RLS + 2FA aal2) ; l'interface ne fait que refléter.
 "use strict";
 (() => {
@@ -141,7 +141,7 @@
     show("s-enroll"); msg("eMsg", "Préparation…");
     const list = await sb.auth.mfa.listFactors();
     for (const f of (list.data?.all || []).filter((f) => f.status !== "verified")) await sb.auth.mfa.unenroll({ factorId: f.id });
-    const { data, error } = await sb.auth.mfa.enroll({ factorType: "totp", friendlyName: "Glace Mauve " + new Date().toISOString().slice(0, 16) });
+    const { data, error } = await sb.auth.mfa.enroll({ factorType: "totp", friendlyName: "Hockey Stats " + new Date().toISOString().slice(0, 16) });
     if (error) return msg("eMsg", errText(error), "err");
     S.enrollFactor = data.id;
     const qr = data.totp.qr_code || "";
@@ -388,7 +388,7 @@
     const rows = [["Date", "Joueur", "Adversaire", "Buts", "Passes", "Points", "Plus-moins"]]
       .concat(S.games.map((g) => [g.played_on, cell(nameOf(g.player_id)), cell(g.opponent), g.goals, g.assists, g.points, g.plus_minus]));
     const blob = new Blob(["﻿" + rows.map((r) => r.join(",")).join("\n")], { type: "text/csv;charset=utf-8" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "glace-mauve-matchs.csv"; a.click();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "hockey-stats-matchs.csv"; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   });
 
