@@ -17,6 +17,14 @@
     document.body.insertAdjacentHTML("beforeend", '<p class="panel gate">Configuration manquante : impossible de joindre le serveur.</p>');
     return;
   }
+  // Lien de réinitialisation envoyé depuis le tableau de bord (jetons dans le fragment) :
+  // on le retire de l'adresse avant que le client PKCE ne le rejette, puis on le valide au démarrage.
+  const linkParams = new URLSearchParams(location.hash.slice(1));
+  const linkRecovery = linkParams.get("type") === "recovery" && linkParams.get("access_token") && linkParams.get("refresh_token")
+    ? { access_token: linkParams.get("access_token"), refresh_token: linkParams.get("refresh_token") } : null;
+  const linkError = linkParams.get("error_description");
+  if (linkRecovery || linkError) history.replaceState(null, "", location.pathname);
+
   const sb = window.supabase.createClient(CFG.url, CFG.key, {
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce" },
   });
@@ -468,5 +476,12 @@
   });
   applyFx();
   resetForm();
-  route();
+  if (linkRecovery) {
+    sb.auth.setSession(linkRecovery).then(({ error }) => {
+      if (!error) { S.recovering = true; return route(); }
+      route().then(() => msg("aMsg", "Lien de réinitialisation invalide ou expiré. Redemande-le avec « Mot de passe oublié ? ».", "err"));
+    });
+  } else {
+    route().then(() => { if (linkError) msg("aMsg", "Lien expiré ou déjà utilisé. Redemande-le avec « Mot de passe oublié ? ».", "err"); });
+  }
 })();
