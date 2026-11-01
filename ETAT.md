@@ -26,6 +26,7 @@ Comptes perso, 2FA obligatoire, données partagées synchronisées. Design mauve
 - Admin : compte perso de Nicolas (courriel dans league_members uniquement). Dépôt public → aucun courriel réel dans les fichiers ni les commits (auteur = adresse noreply GitHub).
 
 ## À faire / En cours / Fait
+- Fait (2026-11-01) : logo « HS » sur palet 3D (web/logo.svg) : en-tête, favicon, apple-touch-icon.png 180 px (rendu par qlmanage + sips depuis une copie sans coins arrondis).
 - Fait (2026-11-01) : case « Se souvenir de moi » (cochée : session localStorage + courriel pré-rempli ; décochée : sessionStorage, rien retenu). Adaptateur `authStorage` dans app.js.
 - Fait (2026-11-01) : Nicolas inscrit, 2FA active, app confirmée fonctionnelle par lui. Historique Git réécrit (courriels retirés).
 - Cette semaine : Nicolas saisit ses matchs manuellement dans l'app.

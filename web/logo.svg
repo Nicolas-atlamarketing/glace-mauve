@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Hockey Stats">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="30%" r="80%">
+      <stop offset="0" stop-color="#3a1878"/>
+      <stop offset=".55" stop-color="#1c0b3a"/>
+      <stop offset="1" stop-color="#0d0718"/>
+    </radialGradient>
+    <linearGradient id="side" x1="0" x2="1">
+      <stop offset="0" stop-color="#1f0c47"/>
+      <stop offset=".5" stop-color="#5b21b6"/>
+      <stop offset="1" stop-color="#1f0c47"/>
+    </linearGradient>
+    <radialGradient id="face" cx="45%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#b9a3ff"/>
+      <stop offset=".6" stop-color="#8b5cf6"/>
+      <stop offset="1" stop-color="#5b21b6"/>
+    </radialGradient>
+    <linearGradient id="front" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e4dbff"/>
+    </linearGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>
+    <g id="hs" fill="none" stroke-width="34" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 0V150M90 0V150M0 75H90M230 0H130V75H230V150H130"/>
+    </g>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <ellipse cx="256" cy="372" rx="170" ry="40" fill="#7fe7ff" opacity=".35" filter="url(#blur)"/>
+  <ellipse cx="256" cy="300" rx="214" ry="62" fill="none" stroke="#7fe7ff" stroke-width="4" opacity=".45" transform="rotate(-10 256 300)"/>
+
+  <!-- palet en 3D -->
+  <path d="M96 315A160 50 0 0 0 416 315V359A160 50 0 0 1 96 359Z" fill="url(#side)"/>
+  <path d="M96 337A160 50 0 0 0 416 337" fill="none" stroke="#7fe7ff" stroke-width="3" opacity=".55"/>
+  <ellipse cx="256" cy="315" rx="160" ry="50" fill="url(#face)" stroke="#7fe7ff" stroke-width="3"/>
+
+  <!-- monogramme HS extrudé -->
+  <g transform="translate(141 120)">
+    <use href="#hs" stroke="#2b1260" transform="translate(10 14)"/>
+    <use href="#hs" stroke="#3b1a78" transform="translate(7 10)"/>
+    <use href="#hs" stroke="#4c1d95" transform="translate(4 6)"/>
+    <use href="#hs" stroke="#7fe7ff" transform="translate(1.5 2)"/>
+    <use href="#hs" stroke="url(#front)"/>
+  </g>
+
+  <!-- éclat glacé -->
+  <path d="M410 104l7 20 20 7-20 7-7 20-7-20-20-7 20-7z" fill="#7fe7ff"/>
+</svg>
