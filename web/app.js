@@ -25,8 +25,22 @@
   const linkError = linkParams.get("error_description");
   if (linkRecovery || linkError) history.replaceState(null, "", location.pathname);
 
+  // « Se souvenir de moi » : coché, la session reste dans localStorage (reconnexion automatique) ;
+  // décoché, elle va dans sessionStorage et disparaît à la fermeture de l'onglet.
+  const webStore = (s) => { try { return window[s]; } catch { return null; } };
+  const remembered = () => webStore("localStorage")?.getItem("hs-remember") !== "0";
+  const authStorage = {
+    getItem: (k) => webStore("sessionStorage")?.getItem(k) ?? webStore("localStorage")?.getItem(k) ?? null,
+    setItem: (k, v) => {
+      const [keep, drop] = remembered() ? ["localStorage", "sessionStorage"] : ["sessionStorage", "localStorage"];
+      webStore(drop)?.removeItem(k);
+      webStore(keep)?.setItem(k, v);
+    },
+    removeItem: (k) => { webStore("sessionStorage")?.removeItem(k); webStore("localStorage")?.removeItem(k); },
+  };
+
   const sb = window.supabase.createClient(CFG.url, CFG.key, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce" },
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce", storage: authStorage },
   });
 
   const S = {
@@ -101,6 +115,17 @@
     $("aHint").hidden = authMode === "login";
     msg("aMsg", "");
   }));
+  $("aRemember").checked = remembered();
+  try { $("aEmail").value = (remembered() && webStore("localStorage")?.getItem("hs-email")) || ""; } catch { /* stockage bloqué */ }
+  const saveRemember = (email) => {
+    try {
+      const ls = webStore("localStorage");
+      if (!ls) return;
+      ls.setItem("hs-remember", $("aRemember").checked ? "1" : "0");
+      if ($("aRemember").checked) ls.setItem("hs-email", email); else ls.removeItem("hs-email");
+    } catch { /* navigation privée : on reste sur le comportement par défaut */ }
+  };
+
   const validEmail = (v) => /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(v);
   const strongEnough = (p) => p.length >= 10 && p.length <= 72 && /[a-z]/i.test(p) && /[0-9]/.test(p) && new Set(p).size >= 5;
 
@@ -112,6 +137,7 @@
     busy($("aSubmit"), async () => {
       msg("aMsg", "…");
       if (authMode === "login") {
+        saveRemember(email);
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) return msg("aMsg", errText(error), "err");
         $("aPass").value = ""; msg("aMsg", ""); route();

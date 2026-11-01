@@ -26,6 +26,7 @@ Comptes perso, 2FA obligatoire, données partagées synchronisées. Design mauve
 - Admin : compte perso de Nicolas (courriel dans league_members uniquement). Dépôt public → aucun courriel réel dans les fichiers ni les commits (auteur = adresse noreply GitHub).
 
 ## À faire / En cours / Fait
+- Fait (2026-11-01) : case « Se souvenir de moi » (cochée : session localStorage + courriel pré-rempli ; décochée : sessionStorage, rien retenu). Adaptateur `authStorage` dans app.js.
 - Fait (2026-11-01) : Nicolas inscrit, 2FA active, app confirmée fonctionnelle par lui. Historique Git réécrit (courriels retirés).
 - Cette semaine : Nicolas saisit ses matchs manuellement dans l'app.
 - Fait : durcissement sécurité (fonctions RLS dans private, mdp 10+ lettres/chiffres, test 32/32 après). Voir SECURITE.md.

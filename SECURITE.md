@@ -35,7 +35,7 @@ Revue défensive de notre propre application (2026-11-01). Aucune garantie de s�
 - **Pas encore testé de bout en bout avec deux vrais comptes humains** (inscription → courriel → QR → code). Je ne peux pas créer de vrais comptes ni saisir de mots de passe : à faire par Nicolas et l'ami. Les identités du test 1 sont simulées au niveau de la base (même mécanisme que les jetons réels, mais pas la couche Auth).
 - Protection contre les mots de passe divulgués : fonction payante de Supabase, non activée. Longueur minimale serveur = défaut Supabase (6) ; 10 imposé seulement côté client.
 - GitHub Pages ne permet pas d'en-têtes HTTP personnalisés : CSP via `<meta>`, anti-iframe en JS (pas `frame-ancestors`).
-- Session stockée dans le navigateur (localStorage) : un XSS la volerait ; atténué par CSP + échappement.
+- Session stockée dans le navigateur (localStorage) si « Se souvenir de moi » est cochée, sinon sessionStorage (effacée à la fermeture de l’onglet) : un XSS la volerait ; atténué par CSP + échappement.
 - Le propriétaire du projet Supabase (Nicolas) garde un accès total via le tableau de bord : c'est aussi la voie de récupération ultime si tous les codes de secours sont perdus (Authentication → Users → supprimer le facteur MFA).
 - Projet gratuit : mis en pause après ~7 jours sans activité (réactivation gratuite dans le tableau de bord). Envoi de courriels Supabase limité (quelques/heure).
 - Dépôt public : le code est lisible (aucun secret dedans) ; la sécurité ne repose pas sur son secret.
